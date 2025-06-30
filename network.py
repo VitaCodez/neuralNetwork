@@ -1,5 +1,5 @@
-from .layer import Layer
-from .neuron import Neuron
+from layer import Layer
+from neuron import Neuron
 import random
 
 
@@ -19,14 +19,14 @@ class neuronNetwork:
                 n,spam = weightRange
                 n = self.architect[i-1]+1
                 weightRange = n,spam
-            self.layers.append(Layer([Neuron(weightRange) for _ in range(neurons)]))
+            self.layers.append(Layer([Neuron(weightRange, i, index) for index in range(neurons)]))
             i+=1
 
     def activate(self, params: list[int, float], get_all_outputs=False) -> float:
         overall_outputs = []
         input = [params for _ in range(len(self.layers[0].neurons))]  # Initialize input for the first layer
         
-        overall_outputs.append(input)
+        overall_outputs.append(params)
         for i, layer in enumerate(self.layers):
             input = layer.activate(input)
             overall_outputs.append(input)

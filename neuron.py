@@ -2,10 +2,11 @@ import math
 import random
 
 class Neuron: 
-    def __init__(self, weights: list):
+    def __init__(self, weights: list, layer_index: int, index):
         self.set_weights(weights) 
         self.error = 0.0
         self.output = 0.0  # Initialize output
+        self.pos = (layer_index, index)
 
     def set_weights(self, weights):
         t = type(weights) 

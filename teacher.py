@@ -1,16 +1,17 @@
-from .network import neuronNetwork
-from .neuron import Neuron
+import math
+from network import neuronNetwork
+from neuron import Neuron
 
 
 class Teacher:
-    def __init__(self, network, dataSet: list[list[int, float]], correctWeights: list, ):
+    def __init__(self, network, dataSet: list[list[int, float]], correctWeights, architecture: list):
         self.network = network
         self.learningRate = 1e-2  # Learning rate
         self.correctWeights = correctWeights
         self.trainingSet = []
         self.testSet = []
         self.splitDataSet(dataSet)
-        self.correct_network = neuronNetwork([4,4,4,1], (4, 1))  # Assuming the last layer has 1 neuron for output
+        self.correct_network = neuronNetwork(architecture, (4, 1))  # Assuming the last layer has 1 neuron for output
         
     def splitDataSet(self, dataSet):
         split_ratio = 0.8  #ratio in which will be dataSet/testSet
@@ -23,7 +24,8 @@ class Teacher:
         #return math.tanh(y)
         x1, x2, x3 = params
         #return math.tanh(math.sin(x1) + math.cos(x2) - math.tanh(x3))
-        return self.correct_network.activate(params)  
+        return math.sin(x1)
+        #return self.correct_network.activate(params)  
         
     
     def Loss(self, params: list[int, float]) -> float:
@@ -37,28 +39,25 @@ class Teacher:
 
     def Backpropagation(self, params: list[int, float]):
         gradientMap = []
+        ouput_of_layers = self.network.get_ouput_of_layers(params)
         for i, layer in enumerate(reversed(self.network.layers)):
             gradientMap.append([])
             for neuron in layer.neurons:
-                g = self.Gradient(params, neuron)
+                g = self.Gradient(params, neuron, ouput_of_layers)
                 gradientMap[i].append(g)
         return gradientMap
     
     
-    def Gradient(self, params: list[int, float], neuron: Neuron) -> list[float]:
-        ouput_of_layers = self.network.get_ouput_of_layers(params)
+    def Gradient(self, params: list[int, float], neuron: Neuron, ouput_of_layers) -> list[float]:
 
         if neuron in self.network.layers[-1].neurons:
+            # Calculate error for the output layer
             error = self.LossDerivative(params)
             layer_index = len(self.network.layers)-1
         else:
-            index = None
-            for l in self.network.layers:
-                if neuron in l.neurons:
-                    index = l.neurons.index(neuron)
-                    break
+            # Calculate error for hidden layers
             error = 0.0
-            layer_index = self.network.layers.index([l for l in self.network.layers if neuron in l.neurons][0])
+            layer_index, index = neuron.pos
             next_layer = self.network.layers[layer_index + 1]
             for next_neuron in next_layer.neurons:
                 error += next_neuron.error * next_neuron.weights[index]
@@ -68,7 +67,8 @@ class Teacher:
         neuron.error = error * activation_derivative
 
         neuron_inputs = ouput_of_layers[layer_index]
-        gradient = [neuron.error * Intput for Intput in neuron_inputs]
+        
+        gradient = [neuron.error * X for X in neuron_inputs]
         gradient.append(neuron.error)  # Bias gradient
         return gradient
 
