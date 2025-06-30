@@ -3,21 +3,20 @@ from neuron import Neuron
 
 
 class Teacher:
-    def __init__(self, network, dataSet: list[list[int, float]], correctWeights: list):
+    def __init__(self, network, dataSet: list[list[int, float]], correctWeights: list, ):
         self.network = network
         self.learningRate = 1e-2  # Learning rate
         self.correctWeights = correctWeights
         self.trainingSet = []
         self.testSet = []
         self.splitDataSet(dataSet)
-        self.correct_network = neuronNetwork([3,3,3,1], 1)  # Assuming the last layer has 1 neuron for output
+        self.correct_network = neuronNetwork([4,4,4,1], (4, 1))  # Assuming the last layer has 1 neuron for output
         
     def splitDataSet(self, dataSet):
-        for i in range(len(dataSet)):
-            if i < 0.8 * len(dataSet):
-                self.trainingSet.append(dataSet[i])
-            else:
-                self.testSet.append(dataSet[i])
+        split_ratio = 0.8  #ratio in which will be dataSet/testSet
+        length  = len(dataSet)
+        self.trainingSet = dataSet[:int(length * split_ratio)]
+        self.testSet = dataSet[int(split_ratio * length):]
 
     def Y(self, params:list[int, float]) -> float:
         #y =  params[0] * self.correctWeights[0] + params[1] * self.correctWeights[1] + params[2] * self.correctWeights[2] + self.correctWeights[-1]
@@ -46,10 +45,12 @@ class Teacher:
         return gradientMap
     
     
-    
     def Gradient(self, params: list[int, float], neuron: Neuron) -> list[float]:
+        ouput_of_layers = self.network.get_ouput_of_layers(params)
+
         if neuron in self.network.layers[-1].neurons:
             error = self.LossDerivative(params)
+            layer_index = len(self.network.layers)-1
         else:
             index = None
             for l in self.network.layers:
@@ -66,8 +67,8 @@ class Teacher:
         activation_derivative = 1.0 - neuron.output ** 2
         neuron.error = error * activation_derivative
 
-        
-        gradient = [neuron.error * param for param in params]
+        neuron_inputs = ouput_of_layers[layer_index]
+        gradient = [neuron.error * Intput for Intput in neuron_inputs]
         gradient.append(neuron.error)  # Bias gradient
         return gradient
 
