@@ -1,6 +1,6 @@
 import random
-from network import neuronNetwork
-from teacher import Teacher
+from .network import neuronNetwork
+from .teacher import Teacher
 
             
     

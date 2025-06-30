@@ -1,5 +1,5 @@
-from network import neuronNetwork
-from neuron import Neuron
+from .network import neuronNetwork
+from .neuron import Neuron
 
 
 class Teacher:

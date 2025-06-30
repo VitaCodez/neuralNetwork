@@ -1,5 +1,5 @@
-from layer import Layer
-from neuron import Neuron
+from .layer import Layer
+from .neuron import Neuron
 import random
 
 
