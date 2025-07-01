@@ -1,9 +1,10 @@
 import random
 import time
+import math
 from network import neuronNetwork
 from teacher import Teacher
 
-            
+     
     
 def makeDataSet(n: int = 1000) -> list[list[int, float]]:
     dataSet = []
@@ -20,7 +21,7 @@ def main():
     dataSet = makeDataSet(1000)
     #weights = [random.uniform(-1, 1) for _ in range(4)] # 3 weights + 1 bias
     #network = Neuron(weights)
-    ARCHITECTURE = [20,15,10,1]
+    ARCHITECTURE = [20,15,1]
     network = neuronNetwork(ARCHITECTURE, (4, 0.1))
     teacher = Teacher(network, dataSet, [3.43, -442.323, 632.81, 31.43], ARCHITECTURE)
     

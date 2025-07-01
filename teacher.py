@@ -1,7 +1,8 @@
 import math
+import random
 from network import neuronNetwork
 from neuron import Neuron
-
+PI2 = math.pi * 2  
 
 class Teacher:
     def __init__(self, network, dataSet: list[list[int, float]], correctWeights, architecture: list):
@@ -20,11 +21,11 @@ class Teacher:
         self.testSet = dataSet[int(split_ratio * length):]
 
     def Y(self, params:list[int, float]) -> float:
-        #y =  params[0] * self.correctWeights[0] + params[1] * self.correctWeights[1] + params[2] * self.correctWeights[2] + self.correctWeights[-1]
-        #return math.tanh(y)
+        
+        
         x1, x2, x3 = params
-        #return math.tanh(math.sin(x1) + math.cos(x2) - math.tanh(x3))
-        return math.sin(x1)
+        
+        return math.tanh(x1+ x2 + x3)  
         #return self.correct_network.activate(params)  
         
     
@@ -86,14 +87,27 @@ class Teacher:
     def Test(self):
         results = []
         for param in self.testSet:
-            results.append(self.Loss(param))
+            results.append(self.Loss(param)*2)
         mean = sum(results) / len(results)
         return f"Squared Mean Error: {mean:.4f}"
 
 
     def Fit(self, iterations: int):
+        epoch = 1
         for i in range(iterations):
             for n in range(len(self.trainingSet)):
                 params = self.trainingSet[n]
                 
+                if epoch % 10000 == 0:
+                    sample = random.randint(10,len(self.trainingSet)-1)
+                    print(self.quickTest(self.trainingSet[sample-10:sample]))
                 self.UpdateWeights(params)
+                epoch += 1
+
+    def quickTest(self, data):
+        error = []
+        for param in data:
+            true = self.Y(param)
+            pred = self.network.activate(param)
+            error.append((pred - true) ** 2)
+        return sum(error) / len(error)
