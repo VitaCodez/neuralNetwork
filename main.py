@@ -2,8 +2,8 @@ import random
 import time
 import math
 from network import neuronNetwork
-from teacher import Teacher
-
+from teacher_from_dataSet import Teacher
+from dataHandler import DataHandler
      
     
 def makeDataSet(n: int = 1000) -> list[list[int, float]]:
@@ -18,22 +18,27 @@ def makeDataSet(n: int = 1000) -> list[list[int, float]]:
 
 def main():
     start = time.time()
-    dataSet = makeDataSet(1000)
-    #weights = [random.uniform(-1, 1) for _ in range(4)] # 3 weights + 1 bias
-    #network = Neuron(weights)
-    ARCHITECTURE = [20,15,1]
+    #dataSet = makeDataSet(1000)
+    handler = DataHandler()
+    trainingSet, correct_train = handler.get_training_data()
+    testSet, correct_test = handler.get_testing_data()
+
+    
+    ARCHITECTURE = [34,34,16,16,1]
     network = neuronNetwork(ARCHITECTURE, (4, 0.1))
-    teacher = Teacher(network, dataSet, [3.43, -442.323, 632.81, 31.43], ARCHITECTURE)
+    teacher = Teacher(network, trainingSet, testSet, correct_train, correct_test, ARCHITECTURE)
     
     
     print("Initial Weights:", network.layers[-1].neurons[0].weights)
-    teacher.Fit(100)
+    teacher.Fit(200)
     print("Trained Weights:", network.layers[-1].neurons[0].weights)
     print(teacher.Test())
-    for _ in range(5):
+    
+    for _ in range(10):
         sample = random.choice(teacher.testSet)
-        true = teacher.Y(sample)
-        pred = network.activate(sample)
+        n = random.randint(0, len(teacher.trainingSet) - 1)
+        true = teacher.Y(n)
+        pred = network.activate(teacher.trainingSet[n])
         print(f"Predikce: {pred:.3f} vs. Správná hodnota: {true:.3f}")
     end = time.time()
     print(f"Time taken: {end - start:.2f} seconds")
