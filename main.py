@@ -24,7 +24,7 @@ def main():
     testSet, correct_test = handler.get_testing_data()
 
     
-    ARCHITECTURE = [34,34,16,16,1]
+    ARCHITECTURE = [34,16,1]
     network = neuronNetwork(ARCHITECTURE, (4, 0.1))
     teacher = Teacher(network, trainingSet, testSet, correct_train, correct_test, ARCHITECTURE)
     
@@ -44,3 +44,5 @@ def main():
     print(f"Time taken: {end - start:.2f} seconds")
 
 main()
+
+

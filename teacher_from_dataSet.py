@@ -7,7 +7,7 @@ PI2 = math.pi * 2
 class Teacher:
     def __init__(self, network, trainingSet, testSet, correct_train, correct_test, architecture: list):
         self.network = network
-        self.learningRate = 1e-2  # Learning rate
+        self.learningRate = 1e-3  # Learning rate
         self.trainingSet = trainingSet
         self.testSet = testSet
         self.training_correct = correct_train
