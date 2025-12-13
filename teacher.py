@@ -10,7 +10,7 @@ class Teacher:
         self.correct_train = correct_train
         self.testSet = testSet
         self.correct_test = correct_test
-
+        
 
     def get_batches(self):
         train_batches = []

@@ -5,20 +5,20 @@ from teacher import Teacher
 import numpy as np
     
 def makeDataSet(n: int = 1000) -> np.ndarray:
-    dataSet = np.random.uniform(-1, 1, (n, 3))
+    dataSet = np.random.uniform(-1.5, 1.5, (n, 4))
     return dataSet
 
 def makeCorrectSet(dataSet: np.ndarray) -> np.ndarray:
     correctSet = []
     for i in range(len(dataSet)):
         # y = sin(3*x1) + x2^2 * cos(3*x3)
-        val = np.sin(3 * dataSet[i][0]) + (dataSet[i][1]**2 * np.cos(3 * dataSet[i][2]))
+        val = np.sin(3 * dataSet[i][0]) + (dataSet[i][1]**2 * np.cos(3 * dataSet[i][2])) + dataSet[i][3]**3
         correctSet.append(val)
     return correctSet 
 
 def main():
     start = time.time()
-    trainingSet = makeDataSet(2000)
+    trainingSet = makeDataSet(20000)
     correct_train = makeCorrectSet(trainingSet)
 
     testSet = makeDataSet(200)
@@ -26,7 +26,7 @@ def main():
 
     # Deeper architecture for non-linear problem
     ARCHITECTURE = [32, 16, 1]
-    network = neuronNetwork(ARCHITECTURE)
+    network = neuronNetwork(ARCHITECTURE, 4)
     teacher = Teacher(network, trainingSet, correct_train, testSet, correct_test)
 
     EPOCHS = 200
