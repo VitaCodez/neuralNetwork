@@ -1,48 +1,48 @@
-import random
 import time
 import math
 from network import neuronNetwork
-from teacher_from_dataSet import Teacher
-from dataHandler import DataHandler
-     
+from teacher import Teacher
+import numpy as np
     
-def makeDataSet(n: int = 1000) -> list[list[int, float]]:
-    dataSet = []
-    for _ in range(n):
-        x1 = random.uniform(-1, 1)
-        x2 = random.uniform(-1, 1)
-        x3 = random.uniform(-1, 1)
-        dataSet.append([x1, x2, x3])
+def makeDataSet(n: int = 1000) -> np.ndarray:
+    dataSet = np.random.uniform(-1, 1, (n, 3))
     return dataSet
 
+def makeCorrectSet(dataSet: np.ndarray) -> np.ndarray:
+    correctSet = []
+    for i in range(len(dataSet)):
+        # y = sin(3*x1) + x2^2 * cos(3*x3)
+        val = np.sin(3 * dataSet[i][0]) + (dataSet[i][1]**2 * np.cos(3 * dataSet[i][2]))
+        correctSet.append(val)
+    return correctSet 
 
 def main():
     start = time.time()
-    #dataSet = makeDataSet(1000)
-    handler = DataHandler()
-    trainingSet, correct_train = handler.get_training_data()
-    testSet, correct_test = handler.get_testing_data()
+    trainingSet = makeDataSet(2000)
+    correct_train = makeCorrectSet(trainingSet)
 
+    testSet = makeDataSet(200)
+    correct_test = makeCorrectSet(testSet)
+
+    # Deeper architecture for non-linear problem
+    ARCHITECTURE = [32, 16, 1]
+    network = neuronNetwork(ARCHITECTURE)
+    teacher = Teacher(network, trainingSet, correct_train, testSet, correct_test)
+
+    EPOCHS = 200
+    print(f"Strating training for {EPOCHS} epochs...")
+    teacher.fit(EPOCHS)
     
-    ARCHITECTURE = [34,16,1]
-    network = neuronNetwork(ARCHITECTURE, (4, 0.1))
-    teacher = Teacher(network, trainingSet, testSet, correct_train, correct_test, ARCHITECTURE)
+    # SME is likely a 1-element array, use .item() to get scalar
+    SME = teacher.test()
+    if isinstance(SME, np.ndarray):
+        SME = SME.item()
+        
+    print(f"SME: {SME:.6f}, RMSE: {math.sqrt(SME):.6f}")
     
-    
-    print("Initial Weights:", network.layers[-1].neurons[0].weights)
-    teacher.Fit(200)
-    print("Trained Weights:", network.layers[-1].neurons[0].weights)
-    print(teacher.Test())
-    
-    for _ in range(10):
-        sample = random.choice(teacher.testSet)
-        n = random.randint(0, len(teacher.trainingSet) - 1)
-        true = teacher.Y(n)
-        pred = network.activate(teacher.trainingSet[n])
-        print(f"Predikce: {pred:.3f} vs. Správná hodnota: {true:.3f}")
     end = time.time()
     print(f"Time taken: {end - start:.2f} seconds")
-
+    
 main()
 
 
