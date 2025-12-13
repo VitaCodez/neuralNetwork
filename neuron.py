@@ -25,3 +25,5 @@ class Neuron:
         z = sum(param * weight  for param, weight in zip(params, self.weights[:-1])) + self.weights[-1]  # Last weight is the bias
         self.output = math.tanh(z)  # Activation function
         return self.output  # Activation function 
+
+
