@@ -1,13 +1,15 @@
 import numpy as np
 import random
-
+import math
 
 class neuronNetwork:
-    def __init__(self, architect: list[int]):
+    def __init__(self, architect: list[int], input_shape=3):
         self.architect = architect
+        self.input_shape = input_shape
         self.weights = []
         self.biases = []
         self.make_matrix(architect)
+        
         
     def load_weights(self, weights, biases):
         self.weights = weights
@@ -20,14 +22,15 @@ class neuronNetwork:
     def make_matrix(self, architect: list[int]):
         layers = []
         biases = []
-        # Assuming input size of the dataset is 3 (based on your teacher.py)
-        in_dim = 3 
-        
+
+        in_dim = self.input_shape 
+        limit = 1 / math.sqrt(in_dim)
+
         for out_dim in architect:
             # Weights: (Current Layer Neurons, Previous Layer Neurons)
-            weights = np.random.uniform(-1, 1, (out_dim, in_dim))
+            weights = np.random.uniform(-limit, limit, (out_dim, in_dim))
             # Biases: (Current Layer Neurons, 1)
-            bias = np.random.uniform(-1, 1, (out_dim, 1))
+            bias = np.zeros((out_dim, 1))
             
             layers.append(weights)
             biases.append(bias)
@@ -46,6 +49,8 @@ class neuronNetwork:
             without_activation_f.append(out)
             if i < len(self.weights) - 1: # Use Tanh for hidden layers, Linear for output layer
                 out = np.tanh(out) # else: out = out (Linear)
+            elif len(weights) != 1:  # Use softmax for output layer
+                out = self.softmax(out)
             activations.append(out)
             x = out
         return activations, without_activation_f
@@ -70,3 +75,8 @@ class neuronNetwork:
     def update_biases(self, errors, learning_rate):
         for i in range(len(self.biases)):
             self.biases[i] -= learning_rate * errors[i]
+
+    def softmax(self, z):
+        shift_z = z - np.max(z, axis=0, keepdims=True)
+        exp_z = np.exp(shift_z)
+        return exp_z / np.sum(exp_z, axis=0, keepdims=True)

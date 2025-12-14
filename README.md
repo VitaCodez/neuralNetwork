@@ -14,7 +14,7 @@ A fully connected Neural Network implemented from scratch in Python, now upgrade
 The network is currently trained to predict the output of a complex non-linear function:
 
 $$
-y = \sin(3x_1) + x_2^2 \cdot \cos(3x_3)
+y = \sin(3x_1) + x_2^2 \cdot \cos(3x_3) + x_4^3
 $$
 
 ### Performance
