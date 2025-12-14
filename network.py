@@ -49,6 +49,8 @@ class neuronNetwork:
             without_activation_f.append(out)
             if i < len(self.weights) - 1: # Use Tanh for hidden layers, Linear for output layer
                 out = np.tanh(out) # else: out = out (Linear)
+            elif len(weights) != 1:  # Use softmax for output layer
+                out = self.softmax(out)
             activations.append(out)
             x = out
         return activations, without_activation_f
@@ -60,7 +62,7 @@ class neuronNetwork:
             layer_input = activations[i-1] if i > 0 else without_activation_f[0]
             layer_output = activations[i]
             if i == len(self.weights) - 1:
-                error.append(layer_output - true_output.reshape(1, -1))
+                error.append(layer_output - true_output)
             else:
                 error.append((self.weights[i+1].T @ error[-1]) * (1 - layer_output**2))
             gradients.append(error[-1] @ layer_input.T)
@@ -73,3 +75,8 @@ class neuronNetwork:
     def update_biases(self, errors, learning_rate):
         for i in range(len(self.biases)):
             self.biases[i] -= learning_rate * errors[i]
+
+    def softmax(self, z):
+        shift_z = z - np.max(z, axis=0, keepdims=True)
+        exp_z = np.exp(shift_z)
+        return exp_z / np.sum(exp_z, axis=0, keepdims=True)
